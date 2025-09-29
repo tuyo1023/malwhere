@@ -1,0 +1,19 @@
+FROM ubuntu:24.04
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y \
+    apache2 \
+    openssh-server \
+    vim \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# rsyslogがインストールされていない状態で/var/log/auth.logを再現するための記述
+RUN mkdir /var/run/sshd
+
+# docker起動時のwarningを回避するための記述
+RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+# docker起動時にinit.shに記載されたシェルコマンドを実行
+COPY scripts/init.sh /usr/local/bin/init.sh
+COPY scripts/anomary_1.sh /usr/local/bin/anomary.sh
+RUN chmod +x /usr/local/bin/init.sh /usr/local/bin/anomary.sh
+CMD ["/usr/local/bin/init.sh"]
