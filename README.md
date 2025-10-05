@@ -22,7 +22,7 @@ cd malwhere
 
 2. 必要なパッケージをインストール:
 ```bash
-
+pip3 install -r requirement.txt
 ```
 
 ## 使用方法
