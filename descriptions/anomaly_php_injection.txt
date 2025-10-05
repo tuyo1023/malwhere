@@ -1,0 +1,50 @@
+==================== 異変の説明 ====================
+内容:
+  /var/www/html/index.php を改ざんし、PHP 内で shell_exec() を用いて 
+  /usr/local/bin/anomaly.sh を実行させる。
+  anomaly.sh は "Anomaly" と表示するだけであるものの、
+  本質的には「Web 経由で任意の OS コマンドを実行できる状態」を作る。
+
+特徴的な挙動:
+  - Web ページ (index.php) にアクセスすると、裏でシェルスクリプトが動作。
+  - shell_exec() を利用した OS コマンド実行が確認可能。
+  - index.php の不自然な変更。
+  - Web サーバ権限 (www-data) でスクリプトが動作。
+
+異常性:
+  - index.php に外部スクリプト実行コードを埋め込むことは通常の運用では不実施。
+  - 攻撃者による任意コード実行 (RCE: Remote Code Execution) の足掛かり。
+  - Web 改ざん、バックドア設置、情報窃取のリスク増大。
+
+==================== 学習ポイント ====================
+- PHP におけるコマンド実行関数:
+  - shell_exec(), system(), exec() などは OS コマンドを実行できる危険な関数。
+- Web 改ざんとバックドア:
+  - 攻撃者は index.php のような入口を改ざんし、任意コード実行の仕組みの埋め込み。
+- 権限の理解:
+  - Apache/Nginx では通常 "www-data" 権限で実行されるため、
+    サーバ権限の奪取や lateral movement の起点になる。
+- 防御策:
+  - Web ルートファイルの改変監視（ハッシュ・整合性検証）。
+  - PHP の危険関数を無効化 (php.ini の disable_functions)。
+  - WAF やファイル監視ツールで改ざんを検知。
+
+==================== 観察方法（コマンド例／防御的な観点で） ====================
+- index.php の改変確認:
+  ls -l /var/www/html/index.php
+  stat /var/www/html/index.php
+- 改ざん内容の調査:
+  grep "shell_exec" /var/www/html/index.php
+- Web アクセス時の挙動確認:
+  curl http://localhost/index.php
+- Apache のログ確認:
+  tail -n 50 /var/log/apache2/access.log
+  tail -n 50 /var/log/apache2/error.log
+
+==================== マルウェア／攻撃の事例（概念的） ====================
+- Webshell の埋め込み:
+  - 攻撃者は PHP ファイルを改ざんしてリモートから任意コマンドを実行。
+- ファイルレス攻撃の一部:
+  - Web 経由で外部スクリプトをロードし、システム内で実行させる手法。
+- サイト改ざん＋バックドア:
+  - 表向きは正常な Web ページだが、裏で攻撃者のコードを実行する仕掛け。
