@@ -102,6 +102,13 @@ class MalWhere(App[None]):
             # self.pop_screen()
         elif data == "description":
             self.push_screen(DescriptionScreen(src="count", anomaly_list=self.game_manager.solved_ids))
+        elif data == "quit":
+            # ゲーム終了の場合、正解数をリセットしてメイン画面に戻る
+            self.game_manager.reset()  # 正解数をリセット
+            self.first = True  # 最初の問題フラグをリセット
+            # すべての画面をポップしてメイン画面に戻る（最低1つは残す）
+            while len(self.screen_stack) > 1:
+                self.pop_screen()
         else:
             self.exit()
 
