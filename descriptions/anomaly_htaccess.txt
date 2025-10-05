@@ -1,0 +1,47 @@
+==================== 異変の説明 ====================
+内容:
+  Apache の設定ファイル /etc/apache2/apache2.conf に
+  AllowOverride All を追記し、/var/www/html/.htaccess を有効化する。
+  さらに /var/www/html/ に index_old.php を設置し、.htaccess によって
+  index.php より優先して index_old.php が読み込まれるように改変する。
+
+特徴的な挙動:
+  - 本来の index.php ではなく、攻撃者が用意した index_old.php を表示。
+  - .htaccess ファイルが新規作成。
+  - Apache 設定ファイルの意図しない書き換え。
+  - Web サーバのドキュメントルートに不審な PHP ファイルが存在。
+
+異常性:
+  - 正常な運用では apache2.conf に勝手に AllowOverride が追記されない。
+  - .htaccess の改変はマルウェアやウェブシェル設置への悪用の危険性。
+  - 不正な PHP ファイルが Web サイト改ざんやバックドアに使われる可能性。
+
+==================== 学習ポイント ====================
+- Apache の挙動制御:
+  - AllowOverride All によって .htaccess の設定が有効化される仕組みを理解。
+  - DirectoryIndex 指令で表示されるファイル順が変わることを確認。
+- 攻撃者の典型手口:
+  - 管理者が気付きにくい .htaccess を利用して不正挙動を隠蔽。
+  - Web サーバの初期ページを置換し、ユーザーを欺いたり C2 通信を仕込む。
+- 防御策:
+  - /var/www/html/ の改変監視、.htaccess の利用制御。
+  - apache2.conf の権限管理と改変検知。
+  - IDS/IPS や WAF による不審リクエストの遮断。
+
+==================== 観察方法（コマンド例／防御的な観点で） ====================
+- Apache 設定ファイルの改変確認:
+  grep -A3 \"<Directory /var/www/html>\" /etc/apache2/apache2.conf
+- .htaccess ファイルの確認:
+  ls -l /var/www/html/.htaccess
+  cat /var/www/html/.htaccess
+- Apache エラーログ／アクセスログの確認:
+  tail -n 50 /var/log/apache2/error.log
+  tail -n 50 /var/log/apache2/access.log
+
+==================== マルウェア／攻撃の事例（概念的） ====================
+- Webshell 設置型マルウェア:
+  - 攻撃者が不正 PHP ファイルを置いて外部から任意コマンドを実行。
+- サイト改ざん:
+  - index ページを書き換えて deface（落書き）やフィッシングページを表示。
+- 永続化手法:
+  - .htaccess によるファイルロード順序変更やアクセス制御で攻撃を持続。
