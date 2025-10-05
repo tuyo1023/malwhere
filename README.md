@@ -20,15 +20,9 @@ git clone https://github.com/tuyo1023/malwhere.git
 cd malwhere
 ```
 
-2. 必要なPythonパッケージをインストール:
+2. 必要なパッケージをインストール:
 ```bash
-pip install -r requirements.txt
-```
 
-3. Dockerが実行されていることを確認:
-```bash
-docker --version
-docker ps
 ```
 
 ## 使用方法
