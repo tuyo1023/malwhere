@@ -87,7 +87,12 @@ class MalWhere(App[None]):
             ans_num = 0
         
         if self.has_anomaly == ans_num:
-            self.game_manager.save_dockerfile_id(self.docker_file_id)
+            # anomaly_0.shは練習問題なので解決済みリストに追加しない
+            if self.docker_file_id != "anomaly_0.sh":
+                self.game_manager.save_dockerfile_id(self.docker_file_id)
+            else:
+                # anomaly_0.shの場合は正解数だけ増やす
+                self.game_manager.correct_count += 1
         else:
             self.game_manager.reset()
     
