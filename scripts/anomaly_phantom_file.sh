@@ -3,7 +3,7 @@ echo "Hello anomaly_phantom_file"
 
 (
 while true; do
-  src="/home/ubuntu/mal8_$((RANDOM % 10)).txt"
+  src="/home/ubuntu/malwhere_$((RANDOM % 10)).txt"
 
   if [ -f "$src" ]; then
     target=$(find / -type d \
