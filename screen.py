@@ -149,3 +149,8 @@ class YesScreen(Screen):
         yield Header()
         yield Static(f"{self.hoge}")
         yield Footer()
+
+class BaseScreen(Screen):
+    def compose(self):
+        return super().compose()
+    

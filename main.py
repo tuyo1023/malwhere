@@ -19,7 +19,6 @@ anomaly_list = set(["anomaly_0", "anomaly_1"])
 
 
 class MalWhere(App[None]):
-    CSS_PATH = "style.tcss"
     def __init__(self, driver_class = None, css_path = None, watch_css = False, ansi_color = False):
         self.game_manager = GameManager()
         self.first = True
@@ -37,8 +36,9 @@ class MalWhere(App[None]):
     @on(Button.Pressed, "#game_start")
     def game_start(self) -> None:
         if self.first:
-            self.docker_file_id = "anomary_0.sh"
+            self.docker_file_id = "anomaly_0.sh"
             self.first = False
+            build_container(self.docker_file_id)
         else:
             self.docker_file_id = choice_docker_file()
             build_container(self.docker_file_id)
@@ -97,8 +97,9 @@ class MalWhere(App[None]):
     def on_count_screen_selected(self, message: CountScreen.Selected) -> None:
         data = message.data
         if data == "next":
-            self.pop_screen()
-            self.pop_screen()
+            self.game_start()
+            # self.pop_screen()
+            # self.pop_screen()
         elif data == "description":
             self.push_screen(DescriptionScreen(src="count", anomaly_list=self.game_manager.solved_ids))
         else:
