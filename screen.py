@@ -134,11 +134,11 @@ class CountScreen(Screen):
         self.post_message(self.Selected(data="next"))
     
     @on(Button.Pressed, "#quit")
-    def quit(self) -> None:
+    def quit_game(self) -> None:
         self.post_message(self.Selected(data="quit"))
     
     @on(Button.Pressed, "#quit_count")
-    def quit(self) -> None:
+    def quit_count(self) -> None:
         self.post_message(self.Selected(data="quit"))
 
     @on(Button.Pressed, "#description")
