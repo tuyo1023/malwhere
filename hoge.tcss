@@ -1,0 +1,15 @@
+/* 列を格納するコンテナ */
+#columns-container {
+    /* 横並びのレイアウト */
+    layout: horizontal;
+    /* コンテンツがはみ出た場合にスクロール */
+    overflow-x: auto;
+}
+
+/* 各列のスタイル */
+.column {
+    /* 横幅をコンテンツに合わせる */
+    width: auto;
+    /* 列同士の間隔を空ける */
+    margin: 0 1;
+}
