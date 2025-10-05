@@ -1,7 +1,7 @@
 from textual import on
 from textual.app import App, ComposeResult
 from textual.widgets import Button, Footer, Header, Static
-from textual.containers import Container
+from textual.containers import Container, ScrollableContainer
 from textual.screen import Screen
 from textual.message import Message
 
@@ -21,7 +21,7 @@ class DescriptionScreen(Screen):
 
     def compose(self) -> ComposeResult:
         yield Header()
-        yield Container(id="Descriptions")
+        yield ScrollableContainer(id="Descriptions")
         yield Button("戻る", id="back_title")
         yield Footer()
 
@@ -126,6 +126,7 @@ class CountScreen(Screen):
             yield Button("終了", id="quit")
         else:
             yield Button("次へ", id="next")
+            yield Button("ゲーム終了", id="quit_count")
         yield Footer()
     
     @on(Button.Pressed, "#next")
@@ -133,6 +134,10 @@ class CountScreen(Screen):
         self.post_message(self.Selected(data="next"))
     
     @on(Button.Pressed, "#quit")
+    def quit(self) -> None:
+        self.post_message(self.Selected(data="quit"))
+    
+    @on(Button.Pressed, "#quit_count")
     def quit(self) -> None:
         self.post_message(self.Selected(data="quit"))
 

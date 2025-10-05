@@ -18,6 +18,6 @@ COPY web/html_backup /var/www/html_backup
 COPY web/index.php /var/www/html
 # docker起動時にinit.shに記載されたシェルコマンドを実行
 COPY scripts/init.sh /usr/local/bin/init.sh
-COPY scripts/anomaly_ssh.sh /usr/local/bin/anomaly.sh
+COPY scripts/anomaly_0.sh /usr/local/bin/anomaly.sh
 RUN chmod +x /usr/local/bin/init.sh /usr/local/bin/anomaly.sh
 CMD ["/usr/local/bin/init.sh"]
