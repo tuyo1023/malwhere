@@ -21,7 +21,7 @@ COPY web/index.php /var/www/html
 
 # スクリプトファイルを最後にコピー（変更が最も頻繁な部分）
 COPY scripts/init.sh /usr/local/bin/init.sh
-COPY scripts/anomaly_sl.sh /usr/local/bin/anomaly.sh
+COPY scripts/anomaly_0.sh /usr/local/bin/anomaly.sh
 RUN chmod +x /usr/local/bin/init.sh /usr/local/bin/anomaly.sh
 
 CMD ["/usr/local/bin/init.sh"]
