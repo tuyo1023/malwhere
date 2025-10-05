@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Hello anomaly_php_injection"
+
 
 PHP_FILE="/var/www/html/index.php"
 SCRIPT="/var/www/html/anomaly.sh"

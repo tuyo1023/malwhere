@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Hello anomaly_encrypt"
+
 
 path="/home/ubuntu"
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Hello anomaly_sl"
+
 
 RCFILE="$HOME/.bashrc"
 

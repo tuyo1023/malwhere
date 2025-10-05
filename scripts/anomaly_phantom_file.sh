@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Hello anomaly_phantom_file"
+
 
 (
 while true; do

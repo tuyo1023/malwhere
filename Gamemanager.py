@@ -15,8 +15,6 @@ class GameManager:
                 return 1
             elif ans == 'n':
                 return 0
-            else:
-                print("yかnで入力してください")
  
     def save_dockerfile_id(self, docker_id: str):
         """正解したときにIDを保存"""

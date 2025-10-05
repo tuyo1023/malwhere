@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Hello anomaly_ssh"
+
 
 USERS=("admin" "root" "test" "guest" "user" "invalid")
 

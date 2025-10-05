@@ -13,7 +13,7 @@ from textual.message import Message
 
 from Gamemanager import GameManager
 from screen import *
-from docker_handle import boot_docker
+from docker_handle import boot_docker, build_container, choice_docker_file
 
 anomaly_list = set(["anomaly_0", "anomaly_1"])
 
@@ -118,7 +118,6 @@ class MalWhere(App[None]):
             self.exit()
 
 if __name__ == "__main__":
-    print("ベース環境をビルドします")
     build_container("anomaly_0.sh")
     app = MalWhere()
     app.run()

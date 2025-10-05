@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Hello htaccess"
+
 
 php_file="/var/www/html/index_old.php"
 htaccess_file="/var/www/html/.htaccess"

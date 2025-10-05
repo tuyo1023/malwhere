@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Hello anomaly_directory"
+
 
 D_PATH="./dummy0"
 
