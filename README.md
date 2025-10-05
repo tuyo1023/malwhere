@@ -26,11 +26,6 @@ pip3 install -r requirements.txt
 sudo gpasswd -a $USER docker
 ```
 
-4. （オプション）Dockerコンテナの事前ビルドで起動時間を短縮:
-```bash
-python3 docker_preload.py
-```
-
 ## 使用方法
 
 1. 仮想環境をアクティベート（インストール時に作成した場合）:
