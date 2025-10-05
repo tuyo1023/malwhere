@@ -1,7 +1,0 @@
-    #Descriptions {
-        display: grid;
-        grid-auto-flow: column;
-        grid-rows: 5;
-        grid-gutter: 1;
-        overflow: auto;
-    }
