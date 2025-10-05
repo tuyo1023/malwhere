@@ -10,7 +10,6 @@ MalWhereは、サイバーセキュリティの学習を目的としたインタ
 
 - Python 3.12+
 - Docker
-- Docker Compose（推奨）
 
 ## インストール
 
