@@ -22,9 +22,13 @@ cd malwhere
 
 2. 必要なパッケージをインストール:
 ```bash
-pip3 install -r requirement.txt
+pip3 install --upgrade -r requirements.txt --break-system-packages
 ```
 
+3. gpasswdで自分のユーザをdockerグループに追加
+```bash
+sudo gpasswd -a $USER docker
+```
 ## 使用方法
 
 1. アプリケーションを起動:
