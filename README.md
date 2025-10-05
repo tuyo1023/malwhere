@@ -17,20 +17,20 @@ WSLでも実行できることは確認しているものの，動作が遅く�
 
 ## インストール
 
-1. リポジトリをクローン:
+1. リポジトリをクローン：
 ```bash
 git clone https://github.com/tuyo1023/malwhere.git
 cd malwhere
 ```
 
-2. Python仮想環境を作成してパッケージをインストール:
+2. Python仮想環境を作成してパッケージをインストール：
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 pip3 install -r requirements.txt
 ```
 
-3. gpasswdで自分のユーザをdockerグループに追加
+3. gpasswdで自分のユーザをdockerグループに追加：
 ```bash
 sudo gpasswd -a $USER docker
 ```
