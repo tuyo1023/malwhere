@@ -2,174 +2,110 @@ import random
 import subprocess
 import json
 import docker
+import os
 
-class GameManager:
-    def __init__(self, clear_threshold=8):
-        """状態を初期化"""
-        self.correct_count = 0
-        self.solved_ids = []
-        self.clear_threshold = clear_threshold
- 
-    def input_ans(self) -> int:
-        """プレイヤーから回答の入力を受け付ける
-        あると答えた場合は1、ないと答えた場合は0
-        """
-        while True:
-            ans = input("異変がある？ (y/n): ").lower()
-            if ans == 'y':
-                return 1
-            elif ans == 'n':
-                return 0
-            else:
-                print("yかnで入力してください")
- 
-    def save_dockerfile_id(self, docker_id: str):
-        """正解したときにIDを保存"""
-        self.solved_ids.append(docker_id)
-        print(self.solved_ids)
- 
-    def reset(self):
-        """不正解時にスコアと保存済みIDをリセット"""
-        self.correct_count = 0
+from textual import on
+from textual.app import App, ComposeResult
+from textual.widgets import Button, Footer, Header, Static
+from textual.containers import Container
+from textual.screen import Screen
+from textual.message import Message
 
-def main():
+from Gamemanager import GameManager
+from screen import *
+from docker_handle import boot_docker
 
-    while True:
-        gm = GameManager()
-        start_or_end = choice_start_or_end()
-        if start_or_end == 0:
-            break
-
-        print("ゲームスタート")
-        num_of_collect = 0
-        while True:
-            docker_file_id = choice_docker_file()
-            build_container(docker_file_id)
-            exist_anomaly = boot_docker(docker_file_id)
-            ans = gm.input_ans()
-
-            if exist_anomaly == ans:
-                num_of_collect += 1
-                gm.save_dockerfile_id(docker_file_id)
-            else:
-                num_of_collect = 0
-            
-            if num_of_collect >= 8:
-                print("clear")
-                return
-            
-            while True:
-                cin = input("continue?[y/n]")
-                if cin == "y" or cin == "Y":
-                    break
-                elif cin == "n" or cin == "N":
-                    return
-                else:
-                    print("もう一度入力してください")
+anomaly_list = set(["anomaly_0", "anomaly_1"])
 
 
-def create_Dockerfile(script):
-    with open("Dockerfile_orig", "r") as f:
-        Dockerfile_text = f.read()
+class MalWhere(App[None]):
+    CSS_PATH = "style.tcss"
+    def __init__(self, driver_class = None, css_path = None, watch_css = False, ansi_color = False):
+        self.game_manager = GameManager()
+        self.first = True
+        self.has_anomaly = False
+        super().__init__(driver_class, css_path, watch_css, ansi_color)
     
-    with open("Dockerfile", "w") as f:
-        f.write(Dockerfile_text.format("scripts/init.sh", "scripts/" + script))
+    def compose(self) -> ComposeResult:
+        yield Header()
+        # yield Static(f"現在の正解数: {self.game_manager.correct_count}")
+        yield Button("ゲームスタート", id="game_start")
+        yield Button("異変の説明を見る", id="description")
+        yield Button("終了", id="quit")
+        yield Footer()
 
-def build_container(script):
-    '''
-    scriptのファイルを埋め込んだDockerファイルからイメージをビルドする
-    ビルドしたimageの名前はmal8
-    '''
-    create_Dockerfile(script)
-    cli = docker.from_env()
-    images = cli.images.build(path="./", tag="mal8")
-    # 中間コンテナ等を削除
-    cli.containers.prune()
-    cli.images.prune()
-
-def choice_start_or_end():
-    while True:
-        soe = input("スタートしますか[y/N]")
-        if soe == "" or soe == "n" or soe == "N":
-            return 0
-        elif soe == "y" or soe == "Y":
-            return 1
+    @on(Button.Pressed, "#game_start")
+    def game_start(self) -> None:
+        if self.first:
+            self.docker_file_id = "anomary_0.sh"
+            self.first = False
         else:
-            print("もう一度入力してください")
+            self.docker_file_id = choice_docker_file()
+            build_container(self.docker_file_id)
 
-def choice_docker_file():
-    """
-    dockerfile のリストからランダムに選ぶ
-    異変あり:異変なし = 7:3
-    """
-    with open("mal_shell.json", "r") as f:
-        mal_dict = json.load(f)
-    DOCKERFILES = []
-    for file_name, mal in mal_dict.items():
-        DOCKERFILES.append((file_name, mal))
-    # 「異変あり」と「異変なし」でリストを分ける
-    normal = [df for df in DOCKERFILES if df[1] == 0]
-    anomaly = [df for df in DOCKERFILES if df[1] == 1]
+        with self.suspend(): 
+            os.system("clear")
+            self.has_anomaly = boot_docker(self.docker_file_id)
+        
+        self.push_screen(AnswerScreen())
+    
+    @on(Button.Pressed, "#description")
+    def switch_description(self) -> None:
+        self.push_screen(DescriptionScreen(src="title", anomaly_list=self.game_manager.solved_ids))
 
-    # 7:3 の割合でまずグループを選ぶ
-    group = random.choices(
-        population=[anomaly, normal],
-        weights=[0.7, 0.3],
-        k=1
-    )[0]
+    @on(Button.Pressed, "#quit")
+    def quit(self) -> None:
+        self.exit()
 
-    # 選んだグループからランダムに 1 つ選ぶ
-    dockerfile_id, _ = random.choice(group)
-    return dockerfile_id
-
-
-def boot_docker(docker_id):
-    """
-    docker_id に応じてコンテナを起動する
-    最大1時間で強制終了
-    成功時 or タイムアウト時: docker_id の has_anomaly を返す
-    エラー時のみ: None を返す
-    """
-    with open("mal_shell.json", "r") as f:
-        mal_dict = json.load(f)
-    DOCKERFILES = []
-    for file_name, mal in mal_dict.items():
-        DOCKERFILES.append((file_name, mal))
-    # 「異変あり」と「異変なし」でリストを分ける
-    normal = [df for df in DOCKERFILES if df[1] == 0]
-    anomaly = [df for df in DOCKERFILES if df[1] == 1]
-
-    try:
-        subprocess.run(
-            ["docker", "run", "-it", "--rm", "mal8"],
-            check=True,
-            timeout=3600   # 1時間でタイムアウト
-        )
-    except subprocess.TimeoutExpired:
-        print(f"[TIMEOUT] exceeded 1 hour, terminating...")
-        # タイムアウトしても has_anomaly を返す
-        for df_id, has_anomaly in DOCKERFILES:
-            if df_id == docker_id:
-                return has_anomaly
-        return None
-    except subprocess.CalledProcessError as e:
-        print(f"[ERROR] Docker {docker_id} failed: {e}")
-        return None
-
-    # 正常終了した場合 → has_anomaly を返す
-    for df_id, has_anomaly in DOCKERFILES:
-        if df_id == docker_id:
-            return has_anomaly
-
-    return None
-
-
-def input_ans():
-    raise NotImplementedError
-
-
-def save_dockerfile_id():
-    raise NotImplementedError
+    def on_detail_screen_selected(self) -> None:
+        self.pop_screen()
+    
+    def on_anomaly_desc_selected(self, message: AnomalyDesc.Selected) -> None:
+        file_name = message.file_name
+        with open(file_name, "r") as f:
+            file_data = f.read()
+        self.push_screen(DetailScreen(file_data))
+    
+    def on_description_screen_selected(self, message: DescriptionScreen.Selected) -> None:
+        if message.src == "count":
+            self.pop_screen()
+        self.pop_screen()
+    
+    def on_title_screen_selected(self, message: TitleScreen.Selected) -> None:
+        with self.suspend(): 
+            os.system("clear")
+            self.docker_file_id = message.docker_file_id
+            self.has_anomaly = boot_docker(self.docker_file_id)
+        
+        self.push_screen(AnswerScreen())
+    
+    def on_answer_screen_selected(self, message: AnswerScreen.Selected) -> None:
+        ans = message.ans
+        if ans == "yes":
+            ans_num = 1
+        else:
+            ans_num = 0
+        
+        if self.has_anomaly == ans_num:
+            self.game_manager.save_dockerfile_id(self.docker_file_id)
+        else:
+            self.game_manager.reset()
+    
+        
+        self.push_screen(CountScreen(self.game_manager.correct_count))
+    
+    def on_count_screen_selected(self, message: CountScreen.Selected) -> None:
+        data = message.data
+        if data == "next":
+            self.pop_screen()
+            self.pop_screen()
+        elif data == "description":
+            self.push_screen(DescriptionScreen(src="count", anomaly_list=self.game_manager.solved_ids))
+        else:
+            self.exit()
 
 if __name__ == "__main__":
-    main()
+    print("ベース環境をビルドします")
+    build_container("anomaly_0.sh")
+    app = MalWhere()
+    app.run()

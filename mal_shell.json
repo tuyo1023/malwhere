@@ -1,4 +1,16 @@
 {
-    "anomary_0.sh": 0,
-    "anomary_1.sh": 1
+    "anomaly_0.sh": false,
+    "anomaly_adduser.sh":true,
+    "anomaly_cron.sh":true,
+    "anomaly_deep_directory.sh":true,
+    "anomaly_htaccess.sh":true,
+    "anomaly_log_injection.sh":true,
+    "anomaly_phantom_file.sh":true,
+    "anomaly_php_injection.sh":true,
+    "anomaly_process.sh":true, 
+    "anomaly_ransom.sh":true,
+    "anomaly_remove_file.sh":true,
+    "anomaly_sl.sh":true,
+    "anomaly_ssh.sh":true,
+    "anomaly_stress.sh":true
 }

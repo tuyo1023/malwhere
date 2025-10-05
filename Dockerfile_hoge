@@ -14,6 +14,6 @@ RUN mkdir /var/run/sshd
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
 # docker起動時にinit.shに記載されたシェルコマンドを実行
 COPY {} /usr/local/bin/init.sh
-COPY {} /usr/local/bin/anomary.sh
-RUN chmod +x /usr/local/bin/init.sh /usr/local/bin/anomary.sh
+COPY {} /usr/local/bin/anomaly.sh
+RUN chmod +x /usr/local/bin/init.sh /usr/local/bin/anomaly.sh
 CMD ["/usr/local/bin/init.sh"]

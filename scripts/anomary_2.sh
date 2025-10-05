@@ -1,1 +1,0 @@
-echo "Hello anomaly2"
